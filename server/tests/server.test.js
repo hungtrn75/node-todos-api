@@ -6,7 +6,7 @@ const { app } = require('./../server');
 const { Todo } = require('./../models/todo');
 
 const todos = [{
-    _id:new ObjectID('5abc7a8219b8a30fe82fca29'),
+    _id: new ObjectID('5abc7a8219b8a30fe82fca29'),
     text: 'test 1'
 }, {
     text: 'test 2'
@@ -85,15 +85,43 @@ describe('GET /todos/:id', () => {
 
     it('should return 404 if todo not found', done => {
         var testid = new ObjectID();
-        request(app)  
+        request(app)
             .get(`/todos/${testid}`)
             .expect(404)
             .end(done)
     })
 
     it('should return 404 for non-objectID', done => {
-        request(app)   
+        request(app)
             .get('/todos/123abc')
+            .expect(404)
+            .end(done)
+    })
+})
+
+describe('DELETE /todos/:id', () => {
+    it('should return todo deleted', done => {
+        request(app)
+            .delete(`/todos/${todos[0]._id}`)
+            .expect(200)
+            .expect(res => {
+                expect(res.body.text).toBe(todos[0].text);
+            })
+            .end((err, res) => {
+                if (err) {
+                    done();
+                }
+                Todo.findById(todos[0]._id).then(todo => {
+                    expect(todo).toBeFalsy();
+                    done();
+                }).catch(e => done(e))
+            })
+    })
+
+    it('should return 404 for non-obj', done => {
+        var id = new ObjectID();
+        request(app)
+            .delete(`/todos/${id}`)
             .expect(404)
             .end(done)
     })
