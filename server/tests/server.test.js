@@ -1,6 +1,8 @@
 const expect = require('expect');
 const request = require('supertest');
 const { ObjectID } = require('mongodb');
+const _ = require('lodash');
+
 
 const { app } = require('./../server');
 const { Todo } = require('./../models/todo');
@@ -125,4 +127,50 @@ describe('DELETE /todos/:id', () => {
             .expect(404)
             .end(done)
     })
+})
+
+describe('PATCH /todos/:id', () => {
+    it('should update todo', done => {
+        var { _id } = todos[0];
+        var text = 'this is test text';
+        request(app)
+            .patch(`/todos/${_id}`)
+            .send({
+                completed: true,
+                text
+            })
+            .expect(200)
+            .expect(res => {
+                expect(res.body.text).toBe(text);
+                expect(res.body.completed).toBe(true);
+                expect(typeof res.body.completedAt).toBe('number');
+            })
+            .end(done)
+    })
+    it('should clear completedAt when todo is not completed', done => {
+        var { _id } = todos[0];
+        var text = 'this is test text';
+        request(app)
+            .patch(`/todos/${_id}`)
+            .send({
+                completed: false,
+                text
+            })
+            .expect(200)
+            .expect(res => {
+                expect(res.body.text).toBe(text);
+                expect(res.body.completed).toBe(false);
+                expect(res.body.completedAt).toBeFalsy();
+            })
+            .end(done)
+    })
+    it('should be false when todo is not found', done => {
+        var _id = new ObjectID();
+        request(app)
+            .patch(`/todos/${_id}`)
+            .send({})
+            .expect(404)
+            .end(done)
+    })
+
 })
