@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 var { mongoose } = require('./db/mongoose');
-var { Todo } = require('./modules/todo');
-var { User } = require('./modules/user');
+var { Todo } = require('./models/todo');
+var { User } = require('./models/user');
 
 var app = express();
 
@@ -23,3 +23,5 @@ app.post('/todos', (req, res) => {
 app.listen(3000, () => {
     console.log('Server is listening on 3000');
 })
+
+module.exports = { app };
