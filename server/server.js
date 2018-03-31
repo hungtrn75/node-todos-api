@@ -98,7 +98,14 @@ app.post('/users', (req, res) => {
     }).then(token => {
         res.header('x-auth', token).send(user);
     }).catch(e => {
-        res.status(400).send(e);
+        if (_.has(e, 'code')) {
+            res.status(400).send({
+                'code': e.code,
+                'errmsg': e.errmsg
+            })
+        } else {
+            res.status(400).send(e);
+        }
     })
 })
 
