@@ -18,6 +18,7 @@ describe('POST /todos', () => {
         var text = 'Test todo text';
         request(app)
             .post('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .send({ text })
             .expect(200)
             .expect(res => {
@@ -38,6 +39,7 @@ describe('POST /todos', () => {
     it('should not create todos with error data', (done) => {
         request(app)
             .post('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .send({})
             .expect(400)
             .end((err, res) => {
@@ -55,9 +57,10 @@ describe('GET /todos', () => {
     it('should get todos', done => {
         request(app)
             .get('/todos')
+            .set('x-auth',users[0].tokens[0].token)
             .expect(200)
             .expect(res => {
-                expect(res.body.length).toBe(2);
+                expect(res.body.length).toBe(1);
             })
             .end(done);
     })
